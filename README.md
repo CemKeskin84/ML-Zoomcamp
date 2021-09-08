@@ -3,6 +3,7 @@ Involves the codes for the assignments and projects of ML-Zoomcamp (September 20
 
 Course info:
   https://datatalks.club/courses/2021-winter-ml-zoomcamp.html
+
 Course Github page:
   https://github.com/alexeygrigorev/mlbookcamp-code/tree/master/course-zoomcamp
 
