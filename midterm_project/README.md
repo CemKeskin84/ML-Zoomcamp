@@ -104,7 +104,3 @@ In line with the context provided above, this project aims to develop a ML servi
 |-----flask_app.py
 
 |-----model.bin
-=======
-
-``` pip install pipenv```
->>>>>>> refs/remotes/origin/main
