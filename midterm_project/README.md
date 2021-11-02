@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## Project information
 
 This repository involves files for the midterm project of ML-Zoomcamp (September 2021 – December 2021) by [Alexey Grigorev](https://github.com/alexeygrigorev) from [DataTalks.Club](https://datatalks.club/).
