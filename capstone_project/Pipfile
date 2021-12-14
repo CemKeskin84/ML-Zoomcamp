@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+seaborn = "*"
+scikit-learn = "*"
+keras-tuner = "*"
+keras = "*"
+opencv-python = "*"
+tensorflow = "*"
+keras-image-helper = "*"
+tflite-runtime = "*"
+pillow = "*"
+imageio = "*"
+
+[dev-packages]
+ipykernel = "*"
+
+[requires]
+python_version = "3.9"
