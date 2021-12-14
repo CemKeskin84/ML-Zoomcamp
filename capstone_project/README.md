@@ -40,15 +40,22 @@ Different CNN architectures are built and compoared for modeling:
 Mask detection is a relatively simple task for CNNs. Pre-trained CNNs can be used for predicting even mask types (medical, oxygen, etc.). Hence, high accuracy scores are attained for binary mask classifiers (with & without) in literature. Since the CNN with pre-trained model yielded scores very close to 1 (overfit), the second best model (CNN with double convolutional layer) is used for deployment. This model is then hypertuned with RandomSearchCV function of Scikit-learn (`notebooks/nb6_hypertuning.ipynb`). Having best parameters for train dataset, the best model is tested on validation dataset (`notebooks/nb7_best_model.ipynb`).
 
 
+## Deployment
+
+- The developed model can be run as local service using the Docker image. (See the `documentation` folder to see how to run it.) Use `test_local.ipynb` file (in `deployment` folder) to test it.
+
+- The developed model is deployed as a API service on AWS. use `test_aws_api.ipynb` file (in `deployment` folder) to test it.
+
+
 ## Repository Content
 
 In line with the problem statement and dataset description provided above, this repository presents:
 
-1. Exploratory analysis of the image collection,
-2. Feature engineering for images (comparing model performance with RGB and grayscale images)
-3. Comparison of different neural network models in terms of their performance for detecting mask,
-4. Development of a containerized local service for mask detection,
-5. Development of a basic web service for mask detection
+1. Exploratory analysis of the image collection (see notebooks folder),
+2. Feature engineering for images (comparing model performance with RGB and grayscale images) (see notebooks folder),
+3. Comparison of different neural network models in terms of their performance for detecting mask (see notebooks folder),
+4. Development of a containerized local service for mask detection  (see deployment folder),
+5. Development of a API based basic web service on AWS for mask detection (see deployment folder)
 
 
 ## Notes:
@@ -59,66 +66,5 @@ In line with the problem statement and dataset description provided above, this 
 
     ```sudo chown $(whoami):$(whoami) /var/run/docker.sock```
 
-- The best model deployed as a service in pythonanywhere.com. How to reach it and get estimations is explained in: /documentation/Using_web_service
-
-- Not being a production project, the web service is created with Flask. A WSGI (gunicorn or Waitress) is not used. 
 
 
-
-
-## Organization of the repository
-/
-
-|-----notes_for_reviewers
-
-|-----Pipfile
-
-|-----Pipfile.lock
-
-|-----README.md
-
-|-/**data**
-
-|-----
-
-|-----
-
-|-/**documentation**
-
-|-----
-
-|-----
-
-|----- 
-
-|-/**local_service**
-
-|-----Dockerfile
-
-|-----model.bin
-
-|-----predict-test.py
-
-|-----predict.py
-
-|-----train.py
-
-|-/**notebooks**
-
-|-----
-
-|-----
-
-|-----
-
-|-----
-
-|-/**web service**
-
-|-----
-
-|-----
-
-|-----
-
-|-----
