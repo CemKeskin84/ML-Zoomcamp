@@ -1,0 +1,142 @@
+Preperation
+
+x@y:~$ mkdir assignment10
+x@y:~$ cd assignment10/
+x@y:~/assignment10$ git clone https://github.com/alexeygrigorev/mlbookcamp-code.git
+Cloning into 'mlbookcamp-code'...
+remote: Enumerating objects: 2217, done.
+remote: Counting objects: 100% (1223/1223), done.
+remote: Compressing objects: 100% (457/457), done.
+remote: Total 2217 (delta 870), reused 992 (delta 736), pack-reused 994
+Receiving objects: 100% (2217/2217), 7.20 MiB | 2.43 MiB/s, done.
+Resolving deltas: 100% (1323/1323), done.
+x@y:~/assignment10$ cd mlbookcamp-code/course-zoomcamp/05-deployment/code/
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ docker build -t churn-model:v001 .
+Sending build context to Docker daemon  46.59kB
+Step 1/8 : FROM python:3.8.12-slim
+ ---> 23a6a071a881
+Step 2/8 : RUN pip install pipenv
+ ---> Using cache
+ ---> e704d28c907a
+Step 3/8 : WORKDIR /app
+ ---> Using cache
+ ---> 6b802df0fe06
+Step 4/8 : COPY ["Pipfile", "Pipfile.lock", "./"]
+ ---> 872ab6b20886
+Step 5/8 : RUN pipenv install --system --deploy
+ ---> Running in 9b7850136e67
+Installing dependencies from Pipfile.lock (ded843)...
+An error occurred while installing scikit-learn==0.24.2 --hash=sha256:49ec0b1361da328da9bb7f1a162836028e72556356adeb53342f8fae6b450d47 --hash=sha256:d177fe1ff47cc235942d628d41ee5b1c6930d8f009f1a451c39b5411e8d0d4cf --hash=sha256:2754c85b2287333f9719db7f23fb7e357f436deed512db3417a02bf6f2830aa5 --hash=sha256:fec42690a2eb646b384eafb021c425fab48991587edb412d4db77acc358b27ce --hash=sha256:3cbd734e1aefc7c5080e6b6973fe062f97c26a1cdfx@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ docker run -it --rm -p 9696:9696 churn-model:v001
+[2022-01-05 21:05:01 +0000] [1] [INFO] Starting gunicorn 20.1.0
+[2022-01-05 21:05:01 +0000] [1] [INFO] Listening at: http://0.0.0.0:9696 (1)
+[2022-01-05 21:05:01 +0000] [1] [INFO] Using worker: sync
+[2022-01-05 21:05:01 +0000] [8] [INFO] Booting worker with pid: 8
+^C[2022-01-05 21:05:51 +0000] [1] [INFO] Handling signal: int
+[2022-01-05 21:05:52 +0000] [8] [INFO] Worker exiting (pid: 8)
+[2022-01-05 21:05:52 +0000] [1] [INFO] Shutting down: Master
+
+
+
+Question1
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ kind --version
+kind version 0.11.1
+
+
+
+Question2
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ kind create cluster
+Creating cluster "kind" ...
+ ✓ Ensuring node image (kindest/node:v1.21.1) 🖼
+ ✓ Preparing nodes 📦  
+ ✓ Writing configuration 📜 
+ ✓ Starting control-plane 🕹️ 
+ ✓ Installing CNI 🔌 
+ ✓ Installing StorageClass 💾 
+Set kubectl context to "kind-kind"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-kind
+
+Not sure what to do next? 😅  Check out https://kind.sigs.k8s.io/docs/user/quick-start/
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ kubectl get service
+NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   5m38s
+
+
+
+Question3
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ kind load docker-image churn-model:v001
+Image: "churn-model:v001" with ID "sha256:d09a401b15b6522291b81baa32ae8f5cfb66906b722f23e8ea1c3119c3957194" not yet present on node "kind-control-plane", loading...
+
+
+
+Question4
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ cat deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn
+spec:
+  selector:
+    matchLabels:
+      app: churn
+  template:
+    metadata:
+      labels:
+        app: churn
+    spec:
+      containers:
+      - name: churn
+        image: churn-model:v001
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 9696
+
+
+
+Question5
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ kubectl apply -f deployment.yaml
+deployment.apps/churn created
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ kubectl get pod
+NAME                     READY   STATUS    RESTARTS   AGE
+churn-8449c67c88-sfp6j   1/1     Running   0          21m
+
+
+
+
+Question6
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ cat service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn
+spec:
+  type: LoadBalancer
+  selector:
+    app: churn
+  ports:
+  - port: 80
+    targetPort: 9696
+
+
+
+Test
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ kubectl apply -f service.yaml
+service/churn created
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ kubectl get serviceNAME         TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+churn        LoadBalancer   10.96.203.254   <pending>     80:30185/TCP   4s
+kubernetes   ClusterIP      10.96.0.1       <none>        443/TCP        16m
+x@y:~/assignment10/mlbookcamp-code/course-zoomcamp/05-deployment/code$ kubectl port-forward service/churn 9696:80
+Forwarding from 127.0.0.1:9696 -> 9696
+Forwarding from [::1]:9696 -> 9696
+Handling connection for 9696
+Handling connection for 9696
+Handling connection for 9696
+
+Test result got in another session
+{'churn': False, 'churn_probability': 0.3257561103397851}
+not sending promo email to xyz-123
+
